@@ -30,7 +30,7 @@ public class MatrixUtil {
         List<Future<Task>> futures = new ArrayList<>();
         for (int i = 0; i < partsNumber; i++) {
             int finalI = i;
-            futures.add(completionService.submit(() -> new Task(finalI, partThreadMultiply(matrixA, matrixB, partMain * finalI, partMain * finalI + partMain))));
+            futures.add(completionService.submit(() -> new Task(finalI, partMultiply(matrixA, matrixB, partMain * finalI, partMain * finalI + partMain))));
         }
         return ((Callable<Task>) () -> {
             Task tasks = new Task(0, new int[matrixSize][matrixSize]);
@@ -72,11 +72,11 @@ public class MatrixUtil {
 
 
     public static int[][] singleThreadMultiply(int[][] matrixA, int[][] matrixB) {
-        return partThreadMultiply(matrixA, matrixB, 0, matrixA.length);
+        return partMultiply(matrixA, matrixB, 0, matrixA.length);
     }
 
     // TODO optimize by https://habrahabr.ru/post/114797/
-    public static int[][] partThreadMultiply(int[][] matrixA, int[][] matrixB, int start, int end) {
+    public static int[][] partMultiply(int[][] matrixA, int[][] matrixB, int start, int end) {        
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
         final int thatColumn[] = new int[matrixSize];
