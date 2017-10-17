@@ -1,6 +1,6 @@
 package ru.javaops.masterjava.matrix;
 
-import java.util.concurrent.ExecutionException;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,12 +14,13 @@ public class MainMatrix {
 
     private final static ExecutorService executor = Executors.newFixedThreadPool(MainMatrix.THREAD_NUMBER);
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         final int[][] matrixA = MatrixUtil.create(MATRIX_SIZE);
         final int[][] matrixB = MatrixUtil.create(MATRIX_SIZE);
 
         double singleThreadSum = 0.;
         double concurrentThreadSum = 0.;
+//        double basicThreadSum = 0.;
         int count = 1;
         while (count < 6) {
             System.out.println("Pass " + count);
@@ -35,7 +36,15 @@ public class MainMatrix {
             out("Concurrent thread time, sec: %.3f", duration);
             concurrentThreadSum += duration;
 
-            if (!MatrixUtil.compare(matrixC, concurrentMatrixC)) {
+
+
+//            start = System.currentTimeMillis();
+//            final int[][] standartMatrixC = MatrixUtil.singleThreadMultiplyBasicVersion(matrixA, matrixB);
+//            duration = (System.currentTimeMillis() - start) / 1000.;
+//            out("Concurrent thread time, sec: %.3f", duration);
+//            basicThreadSum += duration;
+
+            if (!MatrixUtil.compare(matrixC, concurrentMatrixC)) {//|| !MatrixUtil.compare(matrixC, standartMatrixC)) {
                 System.err.println("Comparison failed");
                 break;
             }
@@ -44,6 +53,7 @@ public class MainMatrix {
         executor.shutdown();
         out("\nAverage single thread time, sec: %.3f", singleThreadSum / 5.);
         out("Average concurrent thread time, sec: %.3f", concurrentThreadSum / 5.);
+//        out("Average basic method time, sec: %.3f", basicThreadSum / 5.);
     }
 
     private static void out(String format, double ms) {
