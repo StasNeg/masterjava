@@ -21,6 +21,13 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
+                <xs:element name="Projects">
+                    <xs:complexType>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element ref="Project"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
             </xs:all>
         </xs:complexType>
     </xs:element>
@@ -28,11 +35,12 @@
     <xs:element name="User">
         <xs:complexType>
             <xs:sequence>
-                <xs:element type="xs:string" name="email"/>
                 <xs:element type="xs:string" name="fullName"/>
+                <xs:element type="xs:IDREF" name="group" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute type="flagType" name="flag" use="required"/>
             <xs:attribute type="xs:IDREF" name="city" use="required"/>
+            <xs:attribute type="xs:string" name="email" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -53,4 +61,34 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+
+
+    <xs:element name="Project">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="Group"/>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="name" use="required"/>
+            <xs:attribute type="xs:string" name="description" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Group" type="groupSimple"/>
+
+    <xs:complexType name="groupSimple">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+            <xs:attribute type="groupType" name="type" use="required"/>
+            <xs:attribute type="xs:ID" name="id" use="required"/>
+            </xs:extension>
+    </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="groupType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="REGISTERING"/>
+            <xs:enumeration value="CURRENT"/>
+            <xs:enumeration value="FINISHED"/>
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>

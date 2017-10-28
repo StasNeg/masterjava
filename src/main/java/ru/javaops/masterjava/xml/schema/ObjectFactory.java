@@ -3,6 +3,7 @@ package ru.javaops.masterjava.xml.schema;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
@@ -25,6 +26,8 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _City_QNAME = new QName("http://javaops.ru", "City");
+    private final static QName _Group_QNAME = new QName("http://javaops.ru", "Group");
+    private final static QName _UserGroup_QNAME = new QName("http://javaops.ru", "group");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: ru.javaops.masterjava.xml.schema
@@ -39,6 +42,22 @@ public class ObjectFactory {
      */
     public Payload createPayload() {
         return new Payload();
+    }
+
+    /**
+     * Create an instance of {@link Project }
+     * 
+     */
+    public Project createProject() {
+        return new Project();
+    }
+
+    /**
+     * Create an instance of {@link GroupSimple }
+     * 
+     */
+    public GroupSimple createGroupSimple() {
+        return new GroupSimple();
     }
 
     /**
@@ -66,6 +85,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Payload.Projects }
+     * 
+     */
+    public Payload.Projects createPayloadProjects() {
+        return new Payload.Projects();
+    }
+
+    /**
      * Create an instance of {@link CityType }
      * 
      */
@@ -80,6 +107,25 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://javaops.ru", name = "City")
     public JAXBElement<CityType> createCity(CityType value) {
         return new JAXBElement<CityType>(_City_QNAME, CityType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GroupSimple }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://javaops.ru", name = "Group")
+    public JAXBElement<GroupSimple> createGroup(GroupSimple value) {
+        return new JAXBElement<GroupSimple>(_Group_QNAME, GroupSimple.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://javaops.ru", name = "group", scope = User.class)
+    @XmlIDREF
+    public JAXBElement<Object> createUserGroup(Object value) {
+        return new JAXBElement<Object>(_UserGroup_QNAME, Object.class, User.class, value);
     }
 
 }
