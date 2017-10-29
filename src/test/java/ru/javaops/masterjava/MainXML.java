@@ -6,10 +6,15 @@ import ru.javaops.masterjava.xml.schema.*;
 import ru.javaops.masterjava.xml.util.JaxbParser;
 import ru.javaops.masterjava.xml.util.Schemas;
 import ru.javaops.masterjava.xml.util.XPathProcessor;
+import ru.javaops.masterjava.xml.util.XsltProcessor;
+
 
 import javax.xml.bind.JAXBException;
+
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -23,6 +28,7 @@ public class MainXML {
     public static void main(String[] args) throws Exception {
         System.out.println(getUsersByProject("topjava"));
         System.out.println(getUsersByProjectWithXPath("topjava"));
+        transformXmlToHtml("topjava");
     }
 
     private static final JaxbParser JAXB_PARSER = new JaxbParser(ObjectFactory.class);
@@ -82,4 +88,23 @@ public class MainXML {
             return result.stream().distinct().sorted(Comparator.comparing(String::toString)).collect(toList());
         }
     }
+
+    public static void transformXmlToHtml(String projectName) {
+
+        try (InputStream xslInputStream = Resources.getResource("groups.xsl").openStream();
+             InputStream xmlInputStream = Resources.getResource("payload.xml").openStream();
+             ) {
+
+            XsltProcessor processor = new XsltProcessor(xslInputStream);
+
+            processor.setParametr("projectName", projectName );
+            String html = processor.transform(xmlInputStream);
+            System.out.println(html);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }
