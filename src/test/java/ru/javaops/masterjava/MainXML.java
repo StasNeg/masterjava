@@ -10,24 +10,24 @@ import ru.javaops.masterjava.xml.util.XsltProcessor;
 
 
 import javax.xml.bind.JAXBException;
-
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+
 import static java.util.stream.Collectors.toList;
+
 
 
 public class MainXML {
 
     public static void main(String[] args) throws Exception {
-        System.out.println(getUsersByProject("topjava"));
-        System.out.println(getUsersByProjectWithXPath("topjava"));
+        System.out.println(getUsersByProject("masterjava"));
+        System.out.println(getUsersByProjectWithXPath("masterjava"));
         transformXmlToHtml("topjava");
     }
 
@@ -42,18 +42,15 @@ public class MainXML {
                 Resources.getResource("payload.xml").openStream());
         List<GroupSimple> groupSimples = payload.getProjects().getProject()
                 .stream().filter(x -> x.getName().equals(projectName)).findFirst()
-                .get().getGroup();
-        List<User> result = new ArrayList<>();
-        for (GroupSimple group : groupSimples) {
-            for (User user : payload.getUsers().getUser()) {
-                boolean isPresent = user.getGroup().stream().anyMatch(groupUser -> ((GroupSimple) groupUser.getValue()).getId().equals(group.getId()));
-                if (isPresent) {
-                    result.add(user);
-                }
-            }
-        }
+                .orElseThrow(RuntimeException::new).getGroup();
 
-        return result.stream().distinct().sorted(Comparator.comparing(User::getFullName)).collect(toList());
+        Set<User> result = new TreeSet<User>((o1, o2) ->
+                o1.getFullName().equalsIgnoreCase(o2.getFullName())?
+                        o1.cityToString().compareToIgnoreCase(o2.cityToString()):
+                        o1.getFullName().compareToIgnoreCase(o2.getFullName()));
+        payload.getUsers().getUser().stream().forEach(
+                user -> result.addAll(user.getGroup().stream().filter(x -> groupSimples.contains(x.getValue())).map(x -> user).collect(Collectors.toSet())));
+        return result;
     }
 
     public static List<String> getUsersByProjectWithXPath(String projectName) throws IOException {
