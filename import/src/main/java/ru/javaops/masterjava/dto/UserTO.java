@@ -1,4 +1,4 @@
-package ru.javaops.masterjava.DTO;
+package ru.javaops.masterjava.dto;
 
 
 public class UserTO {

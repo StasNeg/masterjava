@@ -6,7 +6,6 @@
 <body>
 <h1>Import</h1>
 <form action="upload?action=upload" method="post" enctype="multipart/form-data">
-    <input type="text" name="description" />
     <input type="file" name="file" />
     <input type="submit"/>
 </form>

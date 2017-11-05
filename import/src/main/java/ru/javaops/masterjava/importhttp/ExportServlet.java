@@ -1,8 +1,8 @@
-package ru.javaops.masterjava.importHTTP;
+package ru.javaops.masterjava.importhttp;
 
 
 import ru.javaops.masterjava.service.UserService;
-import javax.servlet.ServletConfig;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
@@ -16,16 +16,6 @@ import java.io.InputStream;
 public class ExportServlet extends HttpServlet {
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-    }
-
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
@@ -34,7 +24,7 @@ public class ExportServlet extends HttpServlet {
         } else if ("upload".equals(action)) {
             Part filePart = request.getPart("file"); // Retrieves <input type="file" name="file">
             InputStream fileContent = filePart.getInputStream();
-            request.setAttribute("users", UserService.getUser(fileContent));
+            request.setAttribute("users", UserService.getUsers(fileContent));
             request.getRequestDispatcher("/users.jsp").forward(request, response);
         }
     }

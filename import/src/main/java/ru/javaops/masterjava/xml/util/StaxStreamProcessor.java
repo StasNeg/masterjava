@@ -15,6 +15,8 @@ public class StaxStreamProcessor implements AutoCloseable {
         reader = FACTORY.createXMLStreamReader(is);
     }
 
+
+
     public boolean startElement(String element, String parent) throws XMLStreamException {
         while (reader.hasNext()) {
             int event = reader.next();
@@ -39,6 +41,7 @@ public class StaxStreamProcessor implements AutoCloseable {
     public XMLStreamReader getReader() {
         return reader;
     }
+
 
     public String getAttribute(String name) throws XMLStreamException {
         return reader.getAttributeValue(null, name);

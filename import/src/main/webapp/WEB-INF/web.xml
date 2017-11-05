@@ -7,7 +7,7 @@
     <display-name>Export</display-name>
     <servlet>
         <servlet-name>importServlet</servlet-name>
-        <servlet-class>ru.javaops.masterjava.importHTTP.ExportServlet</servlet-class>
+        <servlet-class>ru.javaops.masterjava.importhttp.ExportServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet-mapping>
