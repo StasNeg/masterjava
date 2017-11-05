@@ -24,9 +24,7 @@ public class UserService {
                 User user = PARSER.unmarshal(processor.getReader(), User.class);
                     users.add(new UserTO(user.getValue(),user.getEmail(),user.getFlag().value()));
             }
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
-        } catch (JAXBException e) {
+        } catch (XMLStreamException | JAXBException e) {
             e.printStackTrace();
         }
         return users;
