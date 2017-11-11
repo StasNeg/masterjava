@@ -45,10 +45,10 @@ public class UserProcessor {
             uploadResultHashMap.put(chunkCounter, uploadUsers(users, uploadExecutor));
         }
         uploadExecutor.shutdown();
-        List<String> results = uploadResultHashMap.entrySet().stream().map(x -> {
-            return "Chunk " + x.getKey() + "Added" + x.getValue();
-        }).collect(Collectors.toList());
-        return results;
+        return uploadResultHashMap.entrySet().stream()
+                .map(x -> "Chunk: " + x.getKey() + "\tAdded:" + x.getValue())
+                .collect(Collectors.toList());
+
     }
 
 }
