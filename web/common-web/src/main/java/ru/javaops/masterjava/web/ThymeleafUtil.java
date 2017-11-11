@@ -17,6 +17,7 @@ public class ThymeleafUtil {
         templateResolver.setPrefix("/WEB-INF/templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setCacheTTLMs(1000L);
+        templateResolver.setCharacterEncoding("UTF-8");
         final TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(templateResolver);
         return engine;

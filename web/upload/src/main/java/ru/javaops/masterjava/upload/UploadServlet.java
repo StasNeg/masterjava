@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+
 
 import static ru.javaops.masterjava.web.ThymeleafListener.engine;
 
@@ -33,17 +33,19 @@ public class UploadServlet extends HttpServlet {
         final WebContext webContext = new WebContext(req, resp, req.getServletContext(), req.getLocale());
 
         try {
-//            http://docs.oracle.com/javaee/6/tutorial/doc/glraq.html
             Part filePart = req.getPart("fileToUpload");
-            if (filePart.getSize() == 0) {
+            if (filePart.getSize() == 0 ) {
                 throw new IllegalStateException("Upload file have not been selected");
             }
+            int chunkSize = Integer.parseInt(req.getParameter("chunkSize"));
             try (InputStream is = filePart.getInputStream()) {
-                List<User> users = userProcessor.process(is);
-                webContext.setVariable("users", users);
-                engine.process("result", webContext, resp.getWriter());
+                webContext.setVariable("uploadsResult", userProcessor.process(is,chunkSize));
+                engine.process("uploadsResult", webContext,resp.getWriter());
             }
-        } catch (Exception e) {
+        }catch (NumberFormatException e){
+            throw new IllegalStateException("Chunk size must be input");
+        }
+        catch (Exception e) {
             webContext.setVariable("exception", e);
             engine.process("exception", webContext, resp.getWriter());
         }

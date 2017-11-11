@@ -1,0 +1,20 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload results</title>
+</head>
+<body>
+<h4><a href="/">Upload XML</a></h4>
+<div class="jumbotron">
+    <div class="container">
+        <br>
+        <h4>Uploads results: </h4>
+        <ul>
+            <li th:each="item:${uploadsResult}"
+                th:text="${item}">
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
