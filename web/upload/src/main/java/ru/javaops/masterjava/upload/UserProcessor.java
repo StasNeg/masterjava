@@ -19,55 +19,65 @@ import java.util.stream.Collectors;
 
 
 public class UserProcessor {
-    private final static UserDao dao = DBIProvider.getDao(UserDao.class);
+
     private static ExecutorService uploadExecutor;
-    private static CompletionService<UploadResult> completionService;
+    //    private static CompletionService<UploadResult> completionService;
     private static final String OK = "OK";
     private static final String DUPLICATE_EMAIL = "Users with duplicate email";
+    private static final String EXCEPTIONS_CAUSE = "TimeoutException | InterruptedException | ExecutionException caused";
     private final static UserDao DAO = DBIProvider.getDao(UserDao.class);
 
     public List<String> process(final InputStream is, int chunkSize) throws XMLStreamException {
         final StaxStreamProcessor processor = new StaxStreamProcessor(is);
         uploadExecutor = Executors.newFixedThreadPool(8);
-        completionService = new ExecutorCompletionService<>(uploadExecutor);
+//        completionService = new ExecutorCompletionService<>(uploadExecutor);
         List<User> users = new ArrayList<>();
         List<Future<UploadResult>> futures = new ArrayList<>();
-        Map<Integer, UploadResult> uploadResultHashMap = new HashMap<>();
-
+        Map<Integer, List<User>> chunks = new HashMap<>();
+        int chunkCounter = 0;
         while (processor.doUntil(XMLEvent.START_ELEMENT, "User")) {
             final String email = processor.getAttribute("email");
             final UserFlag flag = UserFlag.valueOf(processor.getAttribute("flag"));
             final String fullName = processor.getReader().getElementText();
             final User user = new User(fullName, email, flag);
             users.add(user);
-
             if (users.size() == chunkSize) {
-                futures.add(uploadUsers(new ArrayList<>(users)));
-                users.clear();
+                chunkCounter = getChunkCounter(users, futures, chunks, chunkCounter);
             }
         }
         if (users.size() > 0) {
-            futures.add(uploadUsers(new ArrayList<>(users)));
-
+            getChunkCounter(users, futures, chunks, chunkCounter);
         }
-        List<String> results = loadResults(futures).stream().filter(uploadResult -> !uploadResult.isOK).map(UploadResult::toString).collect(Collectors.toList());
+        List<String> results = loadResults(futures, chunks).stream().filter(uploadResult -> !uploadResult.isOK).map(UploadResult::toString).collect(Collectors.toList());
         uploadExecutor.shutdown();
         return results;
     }
 
-    public static Future<UploadResult> uploadUsers(final List<User> usersUpload) {
-        return completionService.submit(() -> saveToDataBase(usersUpload));
+    private int getChunkCounter(List<User> users, List<Future<UploadResult>> futures, Map<Integer, List<User>> chunks, int chunkCounter) {
+        List<User> currentChunk = new ArrayList<>(users);
+        futures.add(uploadUsers(currentChunk));
+        chunks.put(chunkCounter++, currentChunk);
+        users.clear();
+        return chunkCounter;
     }
 
-    public static List<UploadResult> loadResults(List<Future<UploadResult>> futures) {
+    public static Future<UploadResult> uploadUsers(final List<User> usersUpload) {
+        return uploadExecutor.submit(() -> saveToDataBase(usersUpload));
+    }
+
+    public static List<UploadResult> loadResults(List<Future<UploadResult>> futures, Map<Integer, List<User>> chunks) {
         List<UploadResult> result = new ArrayList<>();
-        while (!futures.isEmpty()) {
+        int length = futures.size();
+        for (int i = 0; i < length; i++) {
             try {
-                Future<UploadResult> future = completionService.poll(10, TimeUnit.SECONDS);
-                result.add(future.get());
-                futures.remove(future);
-            } catch (ExecutionException | InterruptedException e) {
-                throw new IllegalStateException("ExecutionException | InterruptedException");
+                UploadResult future = futures.get(i).get(10, TimeUnit.SECONDS); //completionService.poll(10, TimeUnit.SECONDS);
+                result.add(future);
+            } catch (TimeoutException | InterruptedException | ExecutionException e) {
+                UploadResult exeption = new UploadResult();
+                exeption.isOK = false;
+                exeption.notAddingUser = chunks.get(i);
+                exeption.cause = EXCEPTIONS_CAUSE;
+                result.add(exeption);
             }
         }
         return result;
@@ -76,27 +86,27 @@ public class UserProcessor {
     private static UploadResult saveToDataBase(List<User> users) throws Exception {
         UploadResult result = new UploadResult();
         int[] resultBatsh = DAO.insertBatch(users);
-        if (users.size() == resultBatsh.length) {
-            result.isOK = true;
-            result.cause = OK;
-        } else {
-            result.emails = users.stream().map(User::getEmail).collect(Collectors.joining(" : "));
-            result.isOK = false;
-            result.cause = DUPLICATE_EMAIL;
+        for (int i = 0; i < resultBatsh.length; i++) {
+            if (resultBatsh[i] == 0) {
+                result.isOK = false;
+                result.notAddingUser.add(users.get(i));
+                result.cause = DUPLICATE_EMAIL;
+            }
         }
         return result;
     }
 
     private static class UploadResult {
-        private boolean isOK;
-        String emails;
-        private String cause;
+        private boolean isOK = true;
+        List<User> notAddingUser = new ArrayList<>();
+        private String cause = OK;
 
         @Override
         public String toString() {
-            return "Bad upload{" +
-                    "emails(starts|end)='" + emails + '\'' +
-                    ", cause='" + cause + '\'' +
+            return "UploadResult{" +
+                    "Users = " + notAddingUser.stream().map(user -> "[Name " + user.getFullName() + " : email " +
+                    user.getEmail() + "]").collect(Collectors.joining(" || ")) +
+                    " CAUSE='" + cause.toUpperCase() + '\'' +
                     '}';
         }
     }
