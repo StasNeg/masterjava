@@ -1,8 +1,6 @@
 package ru.javaops.masterjava.upload;
 
 import org.thymeleaf.context.WebContext;
-import ru.javaops.masterjava.persist.model.User;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
