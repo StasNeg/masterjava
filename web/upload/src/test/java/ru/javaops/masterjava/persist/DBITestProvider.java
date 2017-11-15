@@ -1,5 +1,7 @@
 package ru.javaops.masterjava.persist;
 
+import ru.javaops.masterjava.persist.model.DBIProvider;
+
 import java.sql.DriverManager;
 
 public class DBITestProvider {

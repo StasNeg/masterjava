@@ -2,6 +2,7 @@ package ru.javaops.masterjava.persist;
 
 import com.google.common.collect.ImmutableList;
 import ru.javaops.masterjava.persist.dao.UserDao;
+import ru.javaops.masterjava.persist.model.DBIProvider;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.model.UserFlag;
 
