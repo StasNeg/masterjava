@@ -30,8 +30,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static javax.xml.bind.JAXBIntrospector.getValue;
-
 @Slf4j
 public class UserProcessor {
     private static final int NUMBER_THREADS = 4;
@@ -109,7 +107,7 @@ public class UserProcessor {
 
     private void addChunkFutures(Map<String, Future<Map<TypeOfErrors,List<String>>>> chunkFutures, List<User> chunk) {
         String emailRange = String.format("[%s-%s]", chunk.get(0).getEmail(), chunk.get(chunk.size() - 1).getEmail());
-        Future<Map<TypeOfErrors,List<String>>> future = executorService.submit(() -> userDao.findIncorrectCityId(chunk));
+        Future<Map<TypeOfErrors,List<String>>> future = executorService.submit(() -> userDao.insertAndGetWrongCityAndConflictEmails(chunk));
         chunkFutures.put(emailRange, future);
         log.info("Submit chunk: " + emailRange);
     }

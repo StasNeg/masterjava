@@ -24,7 +24,6 @@ public class UploadServlet extends HttpServlet {
     private static final int CHUNK_SIZE = 2000;
 
     private final UserProcessor userProcessor = new UserProcessor();
-    private final CityProcessor cityProcessor = new CityProcessor();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         out(req, resp, "", CHUNK_SIZE);

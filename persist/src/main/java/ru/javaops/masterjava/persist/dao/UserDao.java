@@ -60,7 +60,7 @@ public abstract class UserDao implements AbstractDao {
     public abstract int[] insertBatch(@BindBean List<User> users, @BatchChunkSize int chunkSize);
 
     @Transaction
-    public Map<TypeOfErrors,List<String>> findIncorrectCityId(List<User> users) {
+    public Map<TypeOfErrors,List<String>> insertAndGetWrongCityAndConflictEmails(List<User> users) {
         Map<String, List<User>> collectByCity = users.stream().collect(Collectors.groupingBy(User::getCity));
         List<String> resultList = new ArrayList<>();
         Map<TypeOfErrors, List<String>> resultMap = new HashMap<>();
@@ -78,7 +78,7 @@ public abstract class UserDao implements AbstractDao {
     }
 
 
-    public List<String> insertAndGetConflictEmails(List<User> users) {
+    private List<String> insertAndGetConflictEmails(List<User> users) {
         int[] result = insertBatch(users, users.size());
         return IntStreamEx.range(0, users.size())
                 .filter(i -> result[i] == 0)
