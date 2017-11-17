@@ -9,7 +9,11 @@ import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
 import ru.javaops.masterjava.persist.model.DBIProvider;
 import ru.javaops.masterjava.persist.model.User;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RegisterMapperFactory(EntityMapperFactory.class)
 public abstract class UserDao implements AbstractDao {
@@ -34,11 +38,11 @@ public abstract class UserDao implements AbstractDao {
         return id;
     }
 
-    @SqlUpdate("INSERT INTO users (full_name, email, flag) VALUES (:fullName, :email, CAST(:flag AS USER_FLAG)) ")
+    @SqlUpdate("INSERT INTO users (full_name, email, flag, city) VALUES (:fullName, :email, CAST(:flag AS USER_FLAG), :city) ")
     @GetGeneratedKeys
     abstract int insertGeneratedId(@BindBean User user);
 
-    @SqlUpdate("INSERT INTO users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS USER_FLAG)) ")
+    @SqlUpdate("INSERT INTO users (id, full_name, email, flag, city) VALUES (:id, :fullName, :email, CAST(:flag AS USER_FLAG), :city) ")
     abstract void insertWitId(@BindBean User user);
 
     @SqlQuery("SELECT * FROM users ORDER BY full_name, email LIMIT :it")
@@ -50,10 +54,28 @@ public abstract class UserDao implements AbstractDao {
     public abstract void clean();
 
     //    https://habrahabr.ru/post/264281/
-    @SqlBatch("INSERT INTO users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS USER_FLAG))" +
+    @SqlBatch("INSERT INTO users (id, full_name, email, flag, city) VALUES (:id, :fullName, :email, CAST(:flag AS USER_FLAG), :city)" +
             "ON CONFLICT DO NOTHING")
 //            "ON CONFLICT (email) DO UPDATE SET full_name=:fullName, flag=CAST(:flag AS USER_FLAG)")
     public abstract int[] insertBatch(@BindBean List<User> users, @BatchChunkSize int chunkSize);
+
+    @Transaction
+    public Map<TypeOfErrors,List<String>> findIncorrectCityId(List<User> users) {
+        Map<String, List<User>> collectByCity = users.stream().collect(Collectors.groupingBy(User::getCity));
+        List<String> resultList = new ArrayList<>();
+        Map<TypeOfErrors, List<String>> resultMap = new HashMap<>();
+        CityDao dao = DBIProvider.getDao(CityDao.class);
+        collectByCity.entrySet().forEach((Map.Entry<String, List<User>> x) ->{
+            if(dao.getByCityId(x.getKey())==null){
+                resultList.addAll(x.getValue().stream().map(User::getEmail).collect(Collectors.toList()));
+                users.removeAll(x.getValue());
+            }
+        });
+        if(!resultList.isEmpty()) resultMap.put(TypeOfErrors.INCORRECT_CITY, resultList );
+        List<String> resultListEmail = insertAndGetConflictEmails(users);
+        if(!resultListEmail.isEmpty()) resultMap.put(TypeOfErrors.DOUBLE_EMAIL, resultListEmail );
+        return resultMap;
+    }
 
 
     public List<String> insertAndGetConflictEmails(List<User> users) {
@@ -63,4 +85,6 @@ public abstract class UserDao implements AbstractDao {
                 .mapToObj(index -> users.get(index).getEmail())
                 .toList();
     }
+
+
 }
