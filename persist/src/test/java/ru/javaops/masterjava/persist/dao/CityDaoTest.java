@@ -5,15 +5,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ru.javaops.masterjava.persist.CityTestData;
+import ru.javaops.masterjava.persist.CityUserTestData;
 import ru.javaops.masterjava.persist.model.City;
 
 
 import java.util.List;
-
-import static ru.javaops.masterjava.persist.CityTestData.FIRST3_CITIES;
-import static ru.javaops.masterjava.persist.CityTestData.MOW;
-import static ru.javaops.masterjava.persist.CityTestData.MSK;
+import static ru.javaops.masterjava.persist.CityUserTestData.FIRST3_CITIES;
+import static ru.javaops.masterjava.persist.CityUserTestData.MOW;
 
 
 public class CityDaoTest extends AbstractDaoTest<CityDao> {
@@ -24,12 +22,12 @@ public class CityDaoTest extends AbstractDaoTest<CityDao> {
 
     @BeforeClass
     public static void init() throws Exception {
-        CityTestData.init();
+        CityUserTestData.init();
     }
 
     @Before
     public void setUp() throws Exception {
-       CityTestData.setUp();
+       CityUserTestData.setUp();
     }
 
     @Test
