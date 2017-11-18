@@ -1,14 +1,15 @@
 package ru.javaops.masterjava.persist;
 
 import com.google.common.collect.ImmutableList;
+import ru.javaops.masterjava.persist.dao.CityDao;
 import ru.javaops.masterjava.persist.dao.UserDao;
-import ru.javaops.masterjava.persist.model.DBIProvider;
+import ru.javaops.masterjava.persist.model.City;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.model.UserFlag;
 
 import java.util.List;
 
-public class UserTestData {
+public class CityUserTestData {
     public static User ADMIN;
     public static User DELETED;
     public static User FULL_NAME;
@@ -17,7 +18,18 @@ public class UserTestData {
     public static User USER3;
     public static List<User> FIST5_USERS;
 
+    public static City SPB;
+    public static City MOW;
+    public static City KIV;
+    public static City MSK;
+    public static List<City> FIRST3_CITIES;
+
     public static void init() {
+        SPB = new City("Санкт-Петербург", "spb");
+        MOW = new City("Москва", "mow");
+        KIV = new City("Киев", "kiv");
+        MSK = new City("Минск", "msk");
+        FIRST3_CITIES = ImmutableList.of(SPB, MOW,KIV);
         ADMIN = new User("Admin", "admin@javaops.ru", UserFlag.superuser, "mow");
         DELETED = new User("Deleted", "deleted@yandex.ru", UserFlag.deleted, "mow");
         FULL_NAME = new User("Full Name", "gmail@gmail.com", UserFlag.active, "mow");
@@ -28,11 +40,17 @@ public class UserTestData {
     }
 
     public static void setUp() {
-        UserDao dao = DBIProvider.getDao(UserDao.class);
-        dao.clean();
+        CityDao cityDao = DBIProvider.getDao(CityDao.class);
+        cityDao.clean();
         DBIProvider.getDBI().useTransaction((conn, status) -> {
-            FIST5_USERS.forEach(dao::insert);
-            dao.insert(USER3);
+            FIRST3_CITIES.forEach(cityDao::insert);
+            cityDao.insert(MSK);
+        });
+        UserDao userDao = DBIProvider.getDao(UserDao.class);
+//        userDao.clean();
+        DBIProvider.getDBI().useTransaction((conn, status) -> {
+            FIST5_USERS.forEach(userDao::insert);
+            userDao.insert(USER3);
         });
     }
 }

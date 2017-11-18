@@ -42,6 +42,5 @@ public abstract class CityDao  implements AbstractDao{
 
     @SqlUpdate("TRUNCATE cities CASCADE ")
     @Override
-    public void clean() {
-    }
+    public abstract void clean();
 }

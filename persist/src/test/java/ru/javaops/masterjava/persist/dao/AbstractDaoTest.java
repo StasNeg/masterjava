@@ -2,7 +2,7 @@ package ru.javaops.masterjava.persist.dao;
 
 
 import ru.javaops.masterjava.persist.DBITestProvider;
-import ru.javaops.masterjava.persist.model.DBIProvider;
+import ru.javaops.masterjava.persist.DBIProvider;
 
 public abstract class AbstractDaoTest<DAO extends AbstractDao> {
     static {

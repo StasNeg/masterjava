@@ -1,4 +1,4 @@
-package ru.javaops.masterjava.persist.model;
+package ru.javaops.masterjava.persist;
 
 import lombok.extern.slf4j.Slf4j;
 import org.skife.jdbi.v2.DBI;

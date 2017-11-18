@@ -13,10 +13,10 @@ public class Group extends BaseEntity {
     private @NonNull
     GroupType type;
     private @NonNull
-    Integer projectId;
+    String project;
 
-    public Group(Integer id, String name, GroupType type, Integer projectId) {
-        this(name, type, projectId);
+    public Group(Integer id, String name, GroupType type, String project) {
+        this(name, type, project);
         this.id = id;
     }
 }

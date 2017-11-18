@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.thymeleaf.context.WebContext;
 
 import ru.javaops.masterjava.persist.dao.UserDao;
-import ru.javaops.masterjava.persist.model.DBIProvider;
+import ru.javaops.masterjava.persist.DBIProvider;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
