@@ -59,26 +59,7 @@ public abstract class UserDao implements AbstractDao {
 //            "ON CONFLICT (email) DO UPDATE SET full_name=:fullName, flag=CAST(:flag AS USER_FLAG)")
     public abstract int[] insertBatch(@BindBean List<User> users, @BatchChunkSize int chunkSize);
 
-    @Transaction
-    public Map<TypeOfErrors,List<String>> insertAndGetWrongCityAndConflictEmails(List<User> users) {
-        Map<String, List<User>> collectByCity = users.stream().collect(Collectors.groupingBy(User::getCity));
-        List<String> resultList = new ArrayList<>();
-        Map<TypeOfErrors, List<String>> resultMap = new HashMap<>();
-        CityDao dao = DBIProvider.getDao(CityDao.class);
-        collectByCity.entrySet().forEach((Map.Entry<String, List<User>> x) ->{
-            if(dao.getByCityId(x.getKey())==null){
-                resultList.addAll(x.getValue().stream().map(User::getEmail).collect(Collectors.toList()));
-                users.removeAll(x.getValue());
-            }
-        });
-        if(!resultList.isEmpty()) resultMap.put(TypeOfErrors.INCORRECT_CITY, resultList );
-        List<String> resultListEmail = insertAndGetConflictEmails(users);
-        if(!resultListEmail.isEmpty()) resultMap.put(TypeOfErrors.DOUBLE_EMAIL, resultListEmail );
-        return resultMap;
-    }
-
-
-    private List<String> insertAndGetConflictEmails(List<User> users) {
+    public List<String> insertAndGetConflictEmails(List<User> users) {
         int[] result = insertBatch(users, users.size());
         return IntStreamEx.range(0, users.size())
                 .filter(i -> result[i] == 0)

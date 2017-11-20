@@ -3,6 +3,7 @@ package ru.javaops.masterjava.upload;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.skife.jdbi.v2.sqlobject.Transaction;
 import ru.javaops.masterjava.persist.dao.CityDao;
 import ru.javaops.masterjava.persist.dao.TypeOfErrors;
 import ru.javaops.masterjava.persist.dao.UserDao;
@@ -20,10 +21,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +34,6 @@ public class UserProcessor {
 
     private static final JaxbParser jaxbParser = new JaxbParser(ObjectFactory.class);
     private static UserDao userDao = DBIProvider.getDao(UserDao.class);
-    private static CityDao cityDao = DBIProvider.getDao(CityDao.class);
     private ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_THREADS);
 
     @AllArgsConstructor
@@ -53,30 +50,15 @@ public class UserProcessor {
     /*
      * return failed users chunks
      */
-    public List<FailedEmails> process(final InputStream is, int chunkSize) throws XMLStreamException, JAXBException {
+    public List<FailedEmails> process(StaxStreamProcessor staxStreamProcessor, int chunkSize) throws XMLStreamException, JAXBException {
         log.info("Start processing with chunkSize=" + chunkSize);
 
         Map<String, Future<Map<TypeOfErrors,List<String>>>> chunkFutures = new LinkedHashMap<>();  // ordered map (emailRange -> chunk future)
 
         int id = userDao.getSeqAndSkip(chunkSize);
         List<User> chunk = new ArrayList<>(chunkSize);
-        List<City> cities = new ArrayList<>();
-        val processor = new StaxStreamProcessor(is);
+        val processor = staxStreamProcessor;
         val unmarshaller = jaxbParser.createUnmarshaller();
-        XMLStreamReader reader = processor.getReader();
-        while (reader.hasNext()) {
-            int event = reader.next();
-            if (event == XMLEvent.START_ELEMENT) {
-                if ("City".equals(reader.getLocalName())) {
-                    CityType xmlCity = unmarshaller.unmarshal(processor.getReader(), CityType.class);
-                    cities.add(new City(xmlCity.getValue(), xmlCity.getId()));
-                }
-                else if("Users".equals(reader.getLocalName())){
-                    break;
-                }
-            }
-        }
-        cityDao.insertBatch(cities, cities.size());
         while (processor.doUntil(XMLEvent.START_ELEMENT, "User") ) {
             String city = processor.getAttribute("city");
             ru.javaops.masterjava.xml.schema.User xmlUser = unmarshaller.unmarshal(processor.getReader(), ru.javaops.masterjava.xml.schema.User.class);
@@ -105,9 +87,27 @@ public class UserProcessor {
         return failed;
     }
 
+    @Transaction
+    private Map<TypeOfErrors,List<String>> insertAndGetWrongCityAndConflictEmails(List<User> users) {
+        Map<String, List<User>> collectByCity = users.stream().collect(Collectors.groupingBy(User::getCity));
+        List<String> resultList = new ArrayList<>();
+        Map<TypeOfErrors, List<String>> resultMap = new HashMap<>();
+        CityDao dao = DBIProvider.getDao(CityDao.class);
+        collectByCity.entrySet().forEach((Map.Entry<String, List<User>> x) ->{
+            if(dao.getByCityId(x.getKey())==null){
+                resultList.addAll(x.getValue().stream().map(User::getEmail).collect(Collectors.toList()));
+                users.removeAll(x.getValue());
+            }
+        });
+        if(!resultList.isEmpty()) resultMap.put(TypeOfErrors.INCORRECT_CITY, resultList );
+        List<String> resultListEmail = userDao.insertAndGetConflictEmails(users);
+        if(!resultListEmail.isEmpty()) resultMap.put(TypeOfErrors.DOUBLE_EMAIL, resultListEmail );
+        return resultMap;
+    }
+
     private void addChunkFutures(Map<String, Future<Map<TypeOfErrors,List<String>>>> chunkFutures, List<User> chunk) {
         String emailRange = String.format("[%s-%s]", chunk.get(0).getEmail(), chunk.get(chunk.size() - 1).getEmail());
-        Future<Map<TypeOfErrors,List<String>>> future = executorService.submit(() -> userDao.insertAndGetWrongCityAndConflictEmails(chunk));
+        Future<Map<TypeOfErrors,List<String>>> future = executorService.submit(() -> insertAndGetWrongCityAndConflictEmails(chunk));
         chunkFutures.put(emailRange, future);
         log.info("Submit chunk: " + emailRange);
     }

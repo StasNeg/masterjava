@@ -3,6 +3,7 @@ package ru.javaops.masterjava.upload;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.thymeleaf.context.WebContext;
+import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -24,6 +25,7 @@ public class UploadServlet extends HttpServlet {
     private static final int CHUNK_SIZE = 2000;
 
     private final UserProcessor userProcessor = new UserProcessor();
+    private final CityProcessor cityProcessor = new CityProcessor();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         out(req, resp, "", CHUNK_SIZE);
@@ -41,7 +43,8 @@ public class UploadServlet extends HttpServlet {
             } else {
                 Part filePart = req.getPart("fileToUpload");
                 try (InputStream is = filePart.getInputStream()) {
-                    List<UserProcessor.FailedEmails> failed = userProcessor.process(is, chunkSize);
+                    StaxStreamProcessor staxStreamProcessor = cityProcessor.process(is);
+                    List<UserProcessor.FailedEmails> failed = userProcessor.process(staxStreamProcessor, chunkSize);
                     log.info("Failed users: " + failed);
                     final WebContext webContext =
                             new WebContext(req, resp, req.getServletContext(), req.getLocale(),

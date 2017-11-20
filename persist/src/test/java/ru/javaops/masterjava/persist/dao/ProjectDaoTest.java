@@ -33,7 +33,7 @@ public class ProjectDaoTest extends AbstractDaoTest<ProjectDao> {
 
     @Test
     public void getWithLimit() {
-        List<Project> groups = dao.getWithLimit(3);
+        List<Project> groups = dao.getAll();
         Assert.assertEquals(2, groups.size());
     }
 }

@@ -34,7 +34,7 @@ public class CityDaoTest extends AbstractDaoTest<CityDao> {
     public void insertBatch() throws Exception {
         dao.clean();
         dao.insertBatch(FIRST3_CITIES, 2);
-        Assert.assertEquals(3, dao.getWithLimit(100).size());
+        Assert.assertEquals(3, dao.getAll().size());
     }
 
     @Test
@@ -42,12 +42,6 @@ public class CityDaoTest extends AbstractDaoTest<CityDao> {
         dao.clean();
         dao.insertBatch(FIRST3_CITIES, 2);
         Assert.assertEquals(MOW.getFullName(), dao.getByCityId("mow").getFullName());
-    }
-
-    @Test
-    public void getWithLimit() {
-        List<City> cities = dao.getWithLimit(3);
-        Assert.assertEquals(FIRST3_CITIES, cities);
     }
 
 

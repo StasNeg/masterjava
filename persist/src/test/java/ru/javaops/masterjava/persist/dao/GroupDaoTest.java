@@ -36,12 +36,7 @@ public class GroupDaoTest extends AbstractDaoTest<GroupDao> {
     public void insertBatch() throws Exception {
         dao.clean();
         dao.insertBatch(FIRST3_GROUP, 2);
-        Assert.assertEquals(3, dao.getWithLimit(100).size());
+        Assert.assertEquals(3, dao.getAll().size());
     }
 
-    @Test
-    public void getWithLimit() {
-        List<Group> groups = dao.getWithLimit(3);
-        Assert.assertEquals(FIRST3_GROUP.size(), groups.size());
-    }
 }

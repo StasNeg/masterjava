@@ -29,8 +29,8 @@ public abstract class ProjectDao implements AbstractDao{
     @SqlUpdate("INSERT INTO projects (id, name) VALUES (:id, :name) ")
     abstract void insertWitId(@BindBean Project project);
 
-    @SqlQuery("SELECT * FROM projects LIMIT :it")
-    public abstract List<Project> getWithLimit(@Bind int limit);
+    @SqlQuery("SELECT * FROM projects")
+    public abstract List<Project> getAll();
 
 
     @SqlUpdate("TRUNCATE projects CASCADE")

@@ -28,8 +28,8 @@ public abstract class CityDao  implements AbstractDao{
     @SqlUpdate("INSERT INTO cities (id, full_name, cityid) VALUES (:id, :fullName, :cityId)")
     abstract void insertWitId(@BindBean City city);
 
-    @SqlQuery("SELECT * FROM cities LIMIT :it")
-    public abstract List<City> getWithLimit(@Bind int limit);
+    @SqlQuery("SELECT * FROM cities")
+    public abstract List<City> getAll();
 
     @SqlQuery("SELECT * FROM cities WHERE cityId=:cityId")
     public abstract City getByCityId(@Bind(value = "cityId") String cityId);

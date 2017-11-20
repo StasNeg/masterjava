@@ -28,8 +28,8 @@ public abstract class GroupDao implements AbstractDao {
     @SqlUpdate("INSERT INTO groups (id, name, project, type) VALUES (:id, :name, :project, CAST(:type AS GROUP_TYPE)) ")
     abstract void insertWitId(@BindBean Group group);
 
-    @SqlQuery("SELECT * FROM groups LIMIT :it")
-    public abstract List<Group> getWithLimit(@Bind int limit);
+    @SqlQuery("SELECT * FROM groups")
+    public abstract List<Group> getAll();
 
 
 
