@@ -32,3 +32,11 @@ CREATE TABLE user_group (
   group_id INTEGER NOT NULL REFERENCES groups (id),
   CONSTRAINT users_group_idx UNIQUE (user_id, group_id)
 );
+--changeset gkislin:3
+CREATE TABLE emails (
+  id             INTEGER PRIMARY KEY DEFAULT nextval('common_seq'),
+  to_email       TEXT      NOT NULL,
+  subject        TEXT      NOT NULL,
+  body           TEXT      NOT NULL,
+  send_date_time TIMESTAMP NOT NULL
+);
