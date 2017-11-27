@@ -2,13 +2,15 @@ package ru.javaops.masterjava.service.mail;
 
 import com.typesafe.config.Config;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.mail.*;
+import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
+import ru.javaops.masterjava.persist.DBITestProvider;
 import ru.javaops.masterjava.persist.config.Configs;
 import ru.javaops.masterjava.persist.model.DBIProvider;
-import ru.javaops.masterjava.service.persist.DBIEmailProvider;
 import ru.javaops.masterjava.service.persist.dao.EmailDao;
-import ru.javaops.masterjava.service.persist.model.*;
+import ru.javaops.masterjava.service.persist.model.EmailEntity;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MailSender {
     static {
-        DBIEmailProvider.initDBI();
+        DBITestProvider.initDBI();
     }
     private final static Config configEmail = Configs.getConfig("mail.conf","mail");
     private final static EmailDao DAO = DBIProvider.getDao(EmailDao.class);

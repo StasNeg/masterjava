@@ -6,9 +6,9 @@ import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import ru.javaops.masterjava.persist.DBITestProvider;
 import ru.javaops.masterjava.persist.model.DBIProvider;
 
-import ru.javaops.masterjava.service.persist.DBIEmailProvider;
 import ru.javaops.masterjava.service.persist.EmailTestData;
 
 import static ru.javaops.masterjava.service.persist.EmailTestData.FIST3_EMAIL;
@@ -18,7 +18,7 @@ import static ru.javaops.masterjava.service.persist.EmailTestData.FIST3_EMAIL;
 public class EmailDaoTest  {
 
     static {
-        DBIEmailProvider.initDBI();
+        DBITestProvider.initDBI();
     }
     private EmailDao dao = DBIProvider.getDao(EmailDao.class);
     @Rule
