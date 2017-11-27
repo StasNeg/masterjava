@@ -23,8 +23,7 @@ public abstract class EmailDao implements AbstractDao {
     public abstract int insertGeneratedId(@BindBean EmailEntity emailEntity);
 
     @SqlBatch("INSERT INTO emails (" +
-            "to_email, subject, body, send_date_time)  VALUES (:to, :subject, :body, :sendDateTime)" +
-            "ON CONFLICT DO NOTHING")
+            "to_email, subject, body, send_date_time)  VALUES (:to, :subject, :body, :sendDateTime)")
     public abstract void insertBatch(@BindBean List<EmailEntity> emails);
 
     public void insert(EmailEntity email) {

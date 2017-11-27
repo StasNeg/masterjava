@@ -51,7 +51,7 @@ public class MailSender {
         }
         log.info("Send mail to \'" + to + "\' cc \'" + cc + "\' subject \'" + subject + (log.isDebugEnabled() ? "\nbody=" + body : ""));
         saveToEmail(to, subject,body, Timestamp.valueOf(LocalDateTime.now()));
-        return "Send mail to \'" + to + "\' cc \'" + cc + "\' subject \'" + subject + (log.isDebugEnabled() ? "\nbody=" + body : "");
+        return "OK";
     }
 
     private static void saveToEmail(List<Addressee> to, String subject, String body, Timestamp sendDateTime) {

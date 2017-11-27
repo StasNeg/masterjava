@@ -8,8 +8,10 @@ import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
 
 import ru.javaops.masterjava.persist.model.DBIProvider;
 import ru.javaops.masterjava.persist.model.User;
+import ru.javaops.masterjava.persist.model.UserGroup;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @RegisterMapperFactory(EntityMapperFactory.class)
@@ -58,14 +60,16 @@ public abstract class UserDao implements AbstractDao {
 
 
     public List<String> insertAndGetConflictEmails(List<User> users) {
+        List<UserGroup> userGroups = new ArrayList<>();
         int[] result = insertBatch(users, users.size());
         UserGroupDao userGroupDao = DBIProvider.getDao(UserGroupDao.class);
         for (int i = 0; i < result.length; i++) {
             if (result[i] > 0) {
                 Integer [] groupId = new Integer[users.get(i).getGroupsId().size()];
-                userGroupDao.insertBatch(userGroupDao.toUserGroups(users.get(i).getId(),users.get(i).getGroupsId().toArray(groupId)));
+                userGroups.addAll(UserGroupDao.toUserGroups(users.get(i).getId(),users.get(i).getGroupsId().toArray(groupId)));
             }
         }
+        userGroupDao.insertBatch(userGroups);
         return IntStreamEx.range(0, users.size())
                 .filter(i -> result[i] == 0)
                 .mapToObj(index -> users.get(index).getEmail())

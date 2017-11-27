@@ -2,10 +2,8 @@ package ru.javaops.masterjava.upload;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import ru.javaops.masterjava.persist.dao.CityDao;
 import ru.javaops.masterjava.persist.dao.GroupDao;
 import ru.javaops.masterjava.persist.dao.ProjectDao;
-import ru.javaops.masterjava.persist.model.City;
 import ru.javaops.masterjava.persist.model.DBIProvider;
 import ru.javaops.masterjava.persist.model.Group;
 import ru.javaops.masterjava.persist.model.Project;
@@ -14,6 +12,7 @@ import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -24,6 +23,7 @@ public class ProjectGroupProcessor {
     public Map<String, Group> process(StaxStreamProcessor processor) throws XMLStreamException {
         val projects = projectDao.getAsMap();
         val groups = groupDao.getAsMap();
+        List<Group> groupInsert = new ArrayList<>();
         while(processor.startElement("Project", "Projects")){
             val projectName = processor.getAttribute("name");
             val projectText = processor.getElementValue("description");
@@ -33,6 +33,7 @@ public class ProjectGroupProcessor {
             }else{
                 idProject = projects.get(projectName).getId();
             }
+
             while (processor.startElement("Group", "Project")){
                 val groupName = processor.getAttribute("name");
                 if(groups.get(groupName)==null){
@@ -40,6 +41,7 @@ public class ProjectGroupProcessor {
                 }
             }
         }
+        groupDao.insertBatch(groupInsert);
         return groupDao.getAsMap();
     }
 }
