@@ -5,7 +5,8 @@ import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
-import ru.javaops.masterjava.config.Configs;
+import ru.javaops.masterjava.persist.config.Configs;
+
 
 import javax.mail.Authenticator;
 import java.nio.charset.StandardCharsets;
