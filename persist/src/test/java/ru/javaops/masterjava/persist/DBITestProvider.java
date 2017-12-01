@@ -1,6 +1,6 @@
 package ru.javaops.masterjava.persist;
 
-import ru.javaops.masterjava.persist.config.Configs;
+import ru.javaops.masterjava.config.Configs;
 import ru.javaops.masterjava.persist.model.DBIProvider;
 
 import com.typesafe.config.Config;
