@@ -1,27 +1,50 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:form="http://www.w3.org/1999/xhtml"
+      xmlns:input="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Users</title>
 </head>
 <body>
-<table border="1" cellpadding="8" cellspacing="0">
+
+
+<form th-action="@/" method="post" th:object="${emails}" >
+    <table border="1" cellpadding="8" cellspacing="0">
     <thead>
     <tr>
         <th>#</th>
         <th>Full Name</th>
         <th>Email</th>
         <th>Flag</th>
+        <th>SendEmail</th>
     </tr>
     </thead>
     <tbody>
     <!--/*@thymesVar id="users" type="java.util.List<ru.javaops.masterjava.persist.model.User>"*/-->
+
     <tr th:each="user,iter: ${users}">
+
+        <!--<input type="hidden" th:field="${users.get(__${(iter.count-1)}__).fullName}"-->
+        <!--th:value="${users.get(__${(iter.count-1)}__).fullName}"/>-->
+        <!--<input type="hidden" th:field="${users.get(__${(iter.count-1)}__).email}"-->
+        <!--th:value="${users.get(__${(iter.count-1)}__).email}"/>-->
+        <!--<input type="hidden" th:field="${users.get(__${(iter.count-1)}__).flag}"-->
+        <!--th:value="${users.get(__${(iter.count-1)}__).email}"/>-->
+
         <td th:text="${iter.count}"></td>
-        <td th:text="${user.fullName}"></td>
-        <td th:utext="${user.email}"></td>
-        <td th:text="${user.flag}"></td>
+        <td th:utext="${user.email}" th:vaule="${user.email}"></td>
+        <td th:text="${user.fullName}" th:vaule="${user.fullName}"></td>
+        <td th:text="${user.flag}" th:value="${user.flag}"></td>
+        <td><input type="checkbox" id="email" th:field="*{isSend[__${(iter.count-1)}__]}"
+                   th:value="*{isSend[__${(iter.count-1)}__]}"
+                   th:checked="*{isSend[__${(iter.count-1)}__]}"/>
+        </td>
+        <!--<td><input type="checkbox" th:field="${user.sendEmail}" th:value="${user.sendEmail}" /></td>-->
     </tr>
     </tbody>
-</table>
+    </table>
+    <button type="submit" id ="emails" name="emails" th-name="emails" th-value="${{emails}}"></button>
+</form>
+
+
 </body>
 </html>

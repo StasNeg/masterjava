@@ -12,14 +12,14 @@ import java.util.Set;
 //        parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public interface MailService {
 
-    @WebMethod
+    @WebMethod(operationName="sendMail")
     String sendToGroup(
             @WebParam(name = "to") Set<Addressee> to,
             @WebParam(name = "cc") Set<Addressee> cc,
             @WebParam(name = "subject") String subject,
             @WebParam(name = "body") String body);
 
-    @WebMethod
+    @WebMethod(operationName="sendBulk")
     GroupResult sendBulk(
             @WebParam(name = "to") Set<Addressee> to,
             @WebParam(name = "subject") String subject,

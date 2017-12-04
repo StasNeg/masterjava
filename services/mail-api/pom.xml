@@ -9,8 +9,19 @@
         <artifactId>parent</artifactId>
         <relativePath>../../parent/pom.xml</relativePath>
         <version>1.0-SNAPSHOT</version>
-    </parent>
 
+    </parent>
+    <properties>
+        <masterjava.config>/apps/masterjava/config/</masterjava.config>
+        <dependency.locations.enabled>false</dependency.locations.enabled>
+    </properties>
+    <build>
+        <resources>
+            <resource>
+                <directory>${masterjava.config}</directory>
+            </resource>
+        </resources>
+    </build>
     <artifactId>mail-api</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Mail API</name>
