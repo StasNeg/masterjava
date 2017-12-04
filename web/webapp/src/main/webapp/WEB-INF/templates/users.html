@@ -34,15 +34,15 @@
         <td th:utext="${user.email}" th:vaule="${user.email}"></td>
         <td th:text="${user.fullName}" th:vaule="${user.fullName}"></td>
         <td th:text="${user.flag}" th:value="${user.flag}"></td>
-        <td><input type="checkbox" id="email" th:field="*{isSend[__${(iter.count-1)}__]}"
-                   th:value="*{isSend[__${(iter.count-1)}__]}"
-                   th:checked="*{isSend[__${(iter.count-1)}__]}"/>
+        <td><input type="checkbox" th:name="${user.id}" th:field="*{isSend[__${(iter.count-1)}__]}"
+                   th:checked="*{isSend[__${(iter.count-1)}__]}" checked="checked"/>
+            <!--th:value="*{isSend[__${(iter.count-1)}__]}"/>-->
         </td>
         <!--<td><input type="checkbox" th:field="${user.sendEmail}" th:value="${user.sendEmail}" /></td>-->
     </tr>
     </tbody>
     </table>
-    <button type="submit" id ="emails" name="emails" th-name="emails" th-value="${{emails}}"></button>
+    <input type="submit" value="Submit"/>
 </form>
 
 

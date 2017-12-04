@@ -27,5 +27,9 @@ public class MailWSClient {
         WS_CLIENT.getPort().sendToGroup(to, cc, subject, body);
     }
 
+    public static void sendBulk(final Set<Addressee> to, final String subject, final String body) {
+        log.info("Send mail to '" + to + "' cc '" + "' subject '" + subject + (log.isDebugEnabled() ? "\nbody=" + body : ""));
+        WS_CLIENT.getPort().sendBulk(to, subject, body);
+    }
 
 }
