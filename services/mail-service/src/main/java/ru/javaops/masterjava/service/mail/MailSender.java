@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.mail.EmailException;
+import ru.javaops.masterjava.ExceptionType;
 import ru.javaops.masterjava.persist.model.DBIProvider;
 import ru.javaops.masterjava.service.mail.persist.MailCase;
 import ru.javaops.masterjava.service.mail.persist.MailCaseDao;
